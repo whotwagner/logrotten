@@ -4,7 +4,7 @@
  * [ Brief description ]
  *   - logrotate has a race condition vulnerability when it's exectued with
  *     "create"-option.
- *   - If logrotate is executed as root, with the "create"-option and the user
+ *   - If logrotate is executed as root, with the "create"-option and
  *     the user is in control of the logfile path, it is possible to abuse a
  *     race-condition to write files in ANY directories.
  *   - An attacker could elevate his privileges by writing reverse-shells into 
