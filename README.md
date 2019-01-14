@@ -11,7 +11,7 @@
   - This vulnerability was reported by Marc Haber at the debian bug report
     ( https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=400198 )
   - and an issue was opened at the logrotate github-repository by cgzones
-    ( https://github.com/cgzones )
+    ( https://github.com/logrotate/logrotate/issues/216 )
   - This vulnerability was also a challenge at the 35c3 CTF 
     ( https://ctftime.org/event/718 )
   - A detailed description and a PoC of this challenge was written by the 
