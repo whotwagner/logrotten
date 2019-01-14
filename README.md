@@ -1,4 +1,4 @@
-# logrotten - a logrotate exploit
+# logrotate exploit by winning a race condition
 
 ## Brief description
   - logrotate is prone to a race condition vulnerability when it's exectued with
