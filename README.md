@@ -1,4 +1,4 @@
-# logrotate exploit by winning a race condition
+# Winning a race condition in logrotate to elevate privileges
 
 ## Brief description
   - logrotate is prone to a race condition vulnerability when it's exectued with
