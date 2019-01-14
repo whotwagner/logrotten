@@ -39,7 +39,7 @@
  *   - Wolfgang Hotwagner
  *
  * [ Contact ]
- *   - https://tech.feedyourhead.at
+ *   - https://tech.feedyourhead.at/content/abusing-a-race-condition-in-logrotate-to-elevate-privileges
  */
 
 #include <stdio.h>
