@@ -2,7 +2,7 @@
  * logrotate poc exploit
  *
  * [ Brief description ]
- *   - logrotate has a race condition vulnerability when it's exectued with
+ *   - logrotate is prone to a race condition vulnerability when it's exectued with
  *     "create"-option.
  *   - If logrotate is executed as root, with the "create"-option and
  *     the user is in control of the logfile path, it is possible to abuse a
