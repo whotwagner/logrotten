@@ -52,6 +52,7 @@
  *
  * [ Contact ]
  *   - https://tech.feedyourhead.at/content/abusing-a-race-condition-in-logrotate-to-elevate-privileges
+ *   - https://github.com/whotwagner/logrotten
  */
 
 #include <stdio.h>

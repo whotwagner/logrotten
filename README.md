@@ -54,5 +54,5 @@ nice -n -20 ./logrotten /tmp/log/pwnme.log payloadfile
 
 ## Contact
   - https://tech.feedyourhead.at/content/abusing-a-race-condition-in-logrotate-to-elevate-privileges
-
+  - https://github.com/whotwagner/logrotten
 
