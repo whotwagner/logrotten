@@ -1,8 +1,7 @@
 # Winning a race condition in logrotate to elevate privileges
 
 ## Brief description
-  - logrotate is prone to a race condition vulnerability when it's exectued with
-    "create"-option.
+  - logrotate is prone to a race condition after renaming the logfile.
   - If logrotate is executed as root, with the "create"-option and the user
     is in control of the logfile path, it is possible to abuse a race-condition 
     to write files in ANY directories.
@@ -17,6 +16,7 @@
   - Logrotate has to be executed as root
   - The logpath needs to be in control of the attacker
   - "create" option is set in the logrotate configuration
+    (This exploit might not work without)
 
 ## Tested version
   - Debian GNU/Linux 9.5 (stretch)

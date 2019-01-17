@@ -2,11 +2,8 @@
  * logrotate poc exploit
  *
  * [ Brief description ]
- *   - logrotate is prone to a race condition vulnerability when it's exectued with
- *     "create"-option.
- *   - If logrotate is executed as root, with the "create"-option and
- *     the user is in control of the logfile path, it is possible to abuse a
- *     race-condition to write files in ANY directories.
+ *   - logrotate is prone to a race condition after renaming the logfile.
+ *   - If logrotate is executed as root and the user is in control of the logfile path, it is possible to abuse a race-condition to write files in ANY directories.
  *   - An attacker could elevate his privileges by writing reverse-shells into 
  *     directories like "/etc/bash_completition.d/".
  *   - This vulnerability was found during a challenge at the 35c3 CTF 
@@ -17,7 +14,8 @@
  * [ Precondition for privilege escalation ]
  *   - Logrotate needs to be executed as root
  *   - The logpath needs to be in control of the attacker
- *   - "create" option is set in the logrotate configuration
+ *   - "create" option is set in the logrotate configuration. 
+ *     This exploit might not work without
  * 
  * [ Tested version ]
  *   - Debian GNU/Linux 9.5 (stretch)
