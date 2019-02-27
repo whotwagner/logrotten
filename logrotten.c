@@ -95,9 +95,9 @@ int main(int argc, char* argv[] )
   logfile = argv[1];
   payloadfile = argv[2];
 
-  for(j=strlen(logfile); logfile[j] != '/' && j != 0; j--);
+  for(j=strlen(logfile); (logfile[j] != '/') && (j != 0); j--);
 
-  index = strlen(logfile)-j-1;
+  index = j+1;
 
   p = &logfile[index];
 
@@ -114,6 +114,7 @@ int main(int argc, char* argv[] )
   {
 	targetdir= TARGETDIR;
   	targetpath = alloca( ( (strlen(TARGETDIR)) + (strlen(p)) +3) *sizeof(char));
+        targetpath[0] = '\0';
   	strcat(targetpath,TARGETDIR);
   }
   strcat(targetpath,"/");
