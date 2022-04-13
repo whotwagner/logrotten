@@ -21,6 +21,7 @@
   - logrotate 3.8.6
   - logrotate 3.11.0
   - logrotate 3.15.0
+  - logrotate 3.18.0
 
 ## Compile
   - gcc -o logrotten logrotten.c
