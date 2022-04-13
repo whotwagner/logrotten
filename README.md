@@ -15,6 +15,7 @@
   - Any option that creates files is set in the logrotate configuration
 
 ## Tested version
+  - Debian GNU/Linux 11 (bullseye)
   - Debian GNU/Linux 9.5 (stretch)
   - Amazon Linux 2 AMI (HVM)
   - Ubuntu 18.04.1
