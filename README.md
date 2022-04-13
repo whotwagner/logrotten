@@ -44,7 +44,7 @@ If "compress"-option is set in logrotate.cfg:
 
 
 ## Known Problems
-  - It's hard to win the race inside a docker container or on a lvm2-volume
+  - It was hard to win the race inside a docker container or on a lvm2-volume. This version of logrotten improves the reliability.
 
 ## Mitigation
   - make sure that logpath is owned by root
