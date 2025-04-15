@@ -13,7 +13,7 @@
  
 ## Precondition for privilege escalation
   - Logrotate has to be executed as root
-  - The logpath needs to be in control of the attacker
+  - The logpath needs to be under the control of the attacker
   - Any option that creates files is set in the logrotate configuration
 
 ## Tested version
