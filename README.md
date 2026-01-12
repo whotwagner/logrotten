@@ -1,3 +1,6 @@
+> [!WARNING]  
+> This repository has been moved to [$CODEBERG_URL$repo](https://codeberg.org/whotwagner/logrotten). Please visit the new location for the latest updates.
+
 # Winning a race condition in logrotate to elevate privileges
 
 ![Logrotten Logo](/logrotten.png)
