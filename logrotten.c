@@ -88,6 +88,7 @@ int main(int argc, char* argv[] )
 {
   int length, i = 0;
   int j = 0;
+  int z = 0;
   int index = 0;
   int fd;
   int wd;
@@ -177,7 +178,10 @@ int main(int argc, char* argv[] )
 
   index = j+1;
 
-  p = &logfile[index];
+  for(z=strlen(payloadfile); (payloadfile[z] != '/') && (z != 0); z--);
+  if (strstr(payloadfile, "/"))
+    z++;
+  p = &payloadfile[z+1];
 
   logpath = alloca(strlen(logfile)*sizeof(char));
   logpath2 = alloca((strlen(logfile)+2)*sizeof(char));
@@ -215,7 +219,7 @@ int main(int argc, char* argv[] )
   	printf("logpath2: %s\n",logpath2);
   	printf("targetpath: %s\n",targetpath);
   	printf("targetdir: %s\n",targetdir);
-  	printf("p: %s\n",p);
+  	printf("payloadfile: %s\n",p);
   }
 
   /*checking for error*/
